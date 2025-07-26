@@ -81,9 +81,12 @@ torch.save(torch_model.state_dict(), ART_DIR / "quant_torch.pth")
 # ---------- Compare metrics ----------
 X, y = fetch_california_housing(return_X_y=True, as_frame=False)
 pred_orig = sk_model.predict(X)
-pred_quant = (
-    torch_model(torch.tensor(X, dtype=torch.float32)).squeeze().numpy()
-)
+with torch.no_grad():                     # <── added
+    pred_quant = (
+        torch_model(torch.tensor(X, dtype=torch.float32))
+        .squeeze()
+        .numpy()
+    )
 
 metrics = {
     "r2_orig": float(r2_score(y, pred_orig)),
